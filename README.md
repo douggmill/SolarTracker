@@ -3,7 +3,7 @@
 [![Python](https://img.shields.io/badge/python-3.10%2B-blue)](https://www.python.org/)
 [![License: MIT](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 
-SolarTracker computes the sun's azimuth and elevation at a configured observer site using NASA JPL's DE421 planetary ephemeris through [Skyfield](https://rhodesmill.org/skyfield/). It is the software foundation for a dual-axis solar tracker; the current release is a desktop console that reports sun position, sunrise, and sunset.
+SolarTracker computes the sun's azimuth and elevation at a configured observer site using NASA JPL's DE440s planetary ephemeris through [Skyfield](https://rhodesmill.org/skyfield/). It is the software foundation for a dual-axis solar tracker; the current release is a desktop console that reports sun position, sunrise, and sunset.
 
 - [Overview](#overview)
 - [Hardware and goal](#hardware-and-goal)
@@ -17,20 +17,20 @@ SolarTracker computes the sun's azimuth and elevation at a configured observer s
 
 ## Overview
 
-The console reads an observer site (latitude, longitude, and elevation), loads DE421, and prints the sun's topocentric azimuth (eastward from true north) and elevation, including atmospheric refraction by default. Sunrise and sunset for the same civil date are included in the report.
+The console reads an observer site (latitude, longitude, and elevation), loads DE440s, and prints the sun's topocentric azimuth (eastward from true north) and elevation, including atmospheric refraction by default. Sunrise and sunset for the same civil date are included in the report.
 
 Site coordinates that belong to a real installation live only in a gitignored `site_local.py`. The repository ships `site.example.py` with a public placeholder so the project can be cloned and run without exposing a private location.
 
 ## Hardware and goal
 
-The long-term goal is a dual-axis tracker that points a payload at the sun. Position solutions in this repository are accurate enough for that job: Skyfield plus DE421 is compared in the test suite against the public NREL Solar Position Algorithm (SPA) reference case for the laboratory site in Golden, Colorado (Reda & Andreas, NREL/TP-560-34302).
+The long-term goal is a dual-axis tracker that points a payload at the sun. Position solutions in this repository are accurate enough for that job: Skyfield plus DE440s is compared in the test suite against the public NREL Solar Position Algorithm (SPA) reference case for the laboratory site in Golden, Colorado (Reda & Andreas, NREL/TP-560-34302).
 
 On-controller firmware (planned around an ESP32) is deferred. This repository is the Python model, console, and tests that a later firmware port can follow.
 
 
 ## Annual sun range
 
-The chart below is for the configured home site (north Texas), computed at 1-minute steps over 2026 with Skyfield and JPL DE421. It does not publish the site's coordinates.
+The chart below is for the configured home site (north Texas), computed at 1-minute steps over 2026 with Skyfield and JPL DE440s. It does not publish the site's coordinates.
 
 ![Solar-noon elevation and daylight azimuth limits for 2026 at the configured home site (north Texas)](docs/sun_year_2026.png)
 
@@ -57,7 +57,9 @@ source .venv/bin/activate
 pip install -r requirements.txt
 ```
 
-On first run, Skyfield downloads `de421.bsp` (about 17 MB) and small timescale files into the project root. Those files are gitignored. You can also copy a local `de421.bsp` into the project root yourself. To store data somewhere else, set `SOLARTRACKER_DATA` to that directory.
+On first run, SolarTracker downloads JPL's `de440s.bsp` (about 31 MB, years 1849–2150) into the project root if the file is not already there, and Skyfield may also download small timescale files. Those files are gitignored. The ephemeris is fetched only when missing; it is never re-downloaded afterward. You can also copy a local `de440s.bsp` into the project root yourself. To store data somewhere else, set `SOLARTRACKER_DATA` to that directory.
+
+DE440s is a fixed snapshot published by JPL in 2020 that never changes. Replace the file only when JPL publishes a newer or patch release (for example DE442, released in 2025 as a Uranus-focused update to DE440), not on a schedule.
 
 Configure your site (optional, but recommended for personal use):
 
@@ -131,7 +133,7 @@ SolarTracker/
   site.example.py            Public placeholder coordinates (Dallas, Texas)
   site_local.py              Optional real site; gitignored, not in the repo
   solartracker/
-    ephemeris.py             DE421 and timescale loader
+    ephemeris.py             DE440s and timescale loader
     sun.py                   Azimuth, elevation, sunrise, noon, sunset, day table
     tracker.py               Tracker-frame pointing and night-stow policy
   tests/

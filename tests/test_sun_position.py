@@ -31,7 +31,7 @@ NREL_ELEV_M = 1830.14
 NREL_WHEN = datetime(2003, 10, 17, 19, 30, 30, tzinfo=timezone.utc)
 NREL_AZIMUTH = 194.340241
 NREL_ELEVATION = 90.0 - 50.111622  # 39.888378
-# DE421 vs the SPA analytic series should agree to a small fraction of a degree.
+# DE440s vs the SPA analytic series should agree to a small fraction of a degree.
 TOLERANCE_DEG = 0.05
 
 

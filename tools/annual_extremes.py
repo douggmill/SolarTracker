@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Yearly sun-elevation and daylight-azimuth extremes for the configured site.
 
-Uses 1-minute vectorized Skyfield / DE421 samples (about 90 s for one year).
+Uses 1-minute vectorized Skyfield / DE440s samples (about 90 s for one year).
 Prints times and angles only — never site coordinates. Matplotlib is optional:
 without it, the numeric report still runs and the plot is skipped.
 

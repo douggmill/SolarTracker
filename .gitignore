@@ -1,8 +1,9 @@
 # Local site coordinates — never commit this file
 site_local.py
 
-# JPL ephemeris and Skyfield timescale data (downloaded on first run)
+# JPL ephemeris (de440s.bsp, downloaded once if missing) and Skyfield timescale data
 *.bsp
+*.bsp.tmp
 finals2000A.all
 finals2000A.daily.json
 deltat.data

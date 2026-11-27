@@ -2,7 +2,7 @@
 """SolarTracker console: live sun position, or a one-shot report."""
 
 # 2026 sun extremes at the configured home site (north Texas).
-# Computed at 1-minute steps over 2026 with Skyfield and JPL DE421.
+# Computed at 1-minute steps over 2026 with Skyfield and JPL DE440s.
 # Do not record the site latitude, longitude, or a street/house name here.
 #
 # Highest elevation: ~80.0° on June 21 at 1:27 PM CDT.
