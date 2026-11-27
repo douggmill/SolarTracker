@@ -5,6 +5,8 @@ if [ -x .venv/bin/python3 ]; then PY=.venv/bin/python3; else PY=python3; fi
 "$PY" console.py "$@"
 status=$?
 echo
-echo "console.py exited with code $status. Press Enter to close."
-read -r
+if [ -t 0 ]; then
+  echo "console.py exited with code $status. Press Enter to close."
+  read -r
+fi
 exit "$status"

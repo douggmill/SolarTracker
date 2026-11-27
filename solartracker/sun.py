@@ -131,3 +131,118 @@ def sunrise_sunset(
         else:
             set_ = stamp
     return rise, set_
+
+
+def solar_noon(
+    latitude_deg: float,
+    longitude_deg: float,
+    elevation_m: float = 0.0,
+    on_date: Optional[datetime] = None,
+    *,
+    eph=None,
+    ts=None,
+) -> Optional[datetime]:
+    """Return UTC solar noon (meridian transit) for the civil date of ``on_date``."""
+    if eph is None:
+        eph = load_ephemeris()
+    if ts is None:
+        ts = timescale()
+
+    if on_date is None:
+        on_date = datetime.now(timezone.utc)
+    elif on_date.tzinfo is None:
+        on_date = on_date.replace(tzinfo=timezone.utc)
+
+    start = on_date.replace(hour=0, minute=0, second=0, microsecond=0)
+    end = start + timedelta(days=1)
+    loc = wgs84.latlon(latitude_deg, longitude_deg, elevation_m=elevation_m)
+    observer = eph["earth"] + loc
+    t0 = ts.from_datetime(start.astimezone(timezone.utc))
+    t1 = ts.from_datetime(end.astimezone(timezone.utc))
+    times = almanac.find_transits(observer, eph["sun"], t0, t1)
+    if len(times) == 0:
+        return None
+    return times[0].utc_datetime().replace(tzinfo=timezone.utc)
+
+
+@dataclass(frozen=True)
+class TrackSample:
+    """One row in a day's sun/track table."""
+
+    time_utc: datetime
+    azimuth_deg: float
+    elevation_deg: float
+    label: str
+
+
+def sun_track_table(
+    latitude_deg: float,
+    longitude_deg: float,
+    elevation_m: float = 0.0,
+    on_date: Optional[datetime] = None,
+    *,
+    step_minutes: int = 15,
+    eph=None,
+    ts=None,
+) -> list[TrackSample]:
+    """Sun samples from sunrise to sunset, plus exact event times.
+
+    ``on_date`` uses the same civil-date rules as ``sunrise_sunset``.
+    Rows are labeled ``sunrise``, ``solar noon``, ``sunset``, or empty.
+    Returns an empty list if the sun does not rise that day.
+    """
+    if eph is None:
+        eph = load_ephemeris()
+    if ts is None:
+        ts = timescale()
+    if step_minutes <= 0:
+        raise ValueError("step_minutes must be positive")
+
+    if on_date is None:
+        on_date = datetime.now(timezone.utc)
+    elif on_date.tzinfo is None:
+        on_date = on_date.replace(tzinfo=timezone.utc)
+
+    rise, sett = sunrise_sunset(
+        latitude_deg, longitude_deg, elevation_m, on_date, eph=eph, ts=ts
+    )
+    if rise is None or sett is None or sett <= rise:
+        return []
+
+    noon = solar_noon(
+        latitude_deg, longitude_deg, elevation_m, on_date, eph=eph, ts=ts
+    )
+
+    # Step through the local civil clock, starting at sunrise rounded down.
+    local = rise.astimezone(on_date.tzinfo)
+    minute = (local.minute // step_minutes) * step_minutes
+    cursor = local.replace(minute=0, second=0, microsecond=0) + timedelta(minutes=minute)
+    if cursor < local:
+        cursor += timedelta(minutes=step_minutes)
+
+    events: list[tuple[datetime, str]] = [(rise, "sunrise")]
+    if noon is not None and rise <= noon <= sett:
+        events.append((noon, "solar noon"))
+    events.append((sett, "sunset"))
+
+    instants: dict[datetime, str] = {}
+    while cursor < sett:
+        instants.setdefault(cursor.astimezone(timezone.utc), "")
+        cursor += timedelta(minutes=step_minutes)
+    for when, label in events:
+        instants[when] = label
+
+    samples = []
+    for when in sorted(instants):
+        pos = sun_position(
+            latitude_deg, longitude_deg, elevation_m, when, eph=eph, ts=ts
+        )
+        samples.append(
+            TrackSample(
+                time_utc=pos.time_utc,
+                azimuth_deg=pos.azimuth_deg,
+                elevation_deg=pos.elevation_deg,
+                label=instants[when],
+            )
+        )
+    return samples

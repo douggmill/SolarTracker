@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Name=Run SolarTracker Console
+Comment=Run console.py in a terminal
+Exec=/usr/bin/gnome-terminal -- "/PATH/TO/SolarTracker/run_console.sh"
+Path=/PATH/TO/SolarTracker
+Icon=utilities-terminal
+Terminal=false
+Categories=Development;
