@@ -1,0 +1,33 @@
+# Local site coordinates — never commit this file
+site_local.py
+
+# JPL ephemeris and Skyfield timescale data (downloaded on first run)
+*.bsp
+finals2000A.all
+finals2000A.daily.json
+deltat.data
+deltat.preds
+Leap_Second.dat
+
+# Python
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.coverage
+htmlcov/
+*.egg-info/
+dist/
+build/
+
+# Editors / OS
+.idea/
+.vscode/
+*.swp
+.DS_Store
+Thumbs.db
+
+# Logs and scratch
+*.log
