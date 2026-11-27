@@ -78,7 +78,7 @@ def sun_position(
         )
         applied = True
     else:
-        alt, az, _ = apparent.altaz()
+        alt, az, _ = apparent.altaz(temperature_C="standard")
         applied = True
 
     utc = t.utc_datetime().replace(tzinfo=timezone.utc)

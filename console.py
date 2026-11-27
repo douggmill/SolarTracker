@@ -1,6 +1,20 @@
 #!/usr/bin/env python3
 """SolarTracker console: live sun position, or a one-shot report."""
 
+# 2026 sun extremes at the configured home site (north Texas).
+# Computed at 1-minute steps over 2026 with Skyfield and JPL DE421.
+# Do not record the site latitude, longitude, or a street/house name here.
+#
+# Highest elevation: ~80.0° on June 21 at 1:27 PM CDT.
+# Lowest noon elevation: ~33° in late December.
+# Daylight azimuth range:
+#   ~61°  (northeast, summer sunrise, 22 Jun ~6:18 AM CDT, with refraction)
+#   ~299° (northwest, summer sunset,  22 Jun ~8:37 PM CDT)
+# Refraction shifts these by less than half a degree:
+#   geometric:  max elevation 80.011°, azimuth 61.558°–298.427°
+#   refracted:  max elevation 80.014°, azimuth 61.143°–298.866°
+# Required drive range: ~61°–299° azimuth (238° sweep), 0–80° elevation.
+
 from __future__ import annotations
 
 import argparse

@@ -7,6 +7,7 @@ SolarTracker computes the sun's azimuth and elevation at a configured observer s
 
 - [Overview](#overview)
 - [Hardware and goal](#hardware-and-goal)
+- [Annual sun range](#annual-sun-range)
 - [Install](#install)
 - [Usage](#usage)
 - [Testing](#testing)
@@ -25,6 +26,26 @@ Site coordinates that belong to a real installation live only in a gitignored `s
 The long-term goal is a dual-axis tracker that points a payload at the sun. Position solutions in this repository are accurate enough for that job: Skyfield plus DE421 is compared in the test suite against the public NREL Solar Position Algorithm (SPA) reference case for the laboratory site in Golden, Colorado (Reda & Andreas, NREL/TP-560-34302).
 
 On-controller firmware (planned around an ESP32) is deferred. This repository is the Python model, console, and tests that a later firmware port can follow.
+
+
+## Annual sun range
+
+The chart below is for the configured home site (north Texas), computed at 1-minute steps over 2026 with Skyfield and JPL DE421. It does not publish the site's coordinates.
+
+![Solar-noon elevation and daylight azimuth limits for 2026 at the configured home site (north Texas)](docs/sun_year_2026.png)
+
+| Extreme | Value | When |
+| --- | --- | --- |
+| Highest elevation | ~80.0° | 21 Jun, 1:27 PM CDT |
+| Lowest noon elevation | ~33° | late December |
+| Summer sunrise azimuth | ~61° (northeast) | 22 Jun, ~6:18 AM CDT, with refraction |
+| Summer sunset azimuth | ~299° (northwest) | 22 Jun, ~8:37 PM CDT |
+| Required azimuth drive | ~61°–299° (238° sweep) | |
+| Required elevation drive | 0–80° | |
+
+Atmospheric refraction shifts these figures by less than half a degree (geometric: max elevation 80.011°, azimuth 61.558°–298.427°; with refraction: 80.014°, 61.143°–298.866°).
+
+`python tools/annual_extremes.py --year 2026 --output docs/sun_year_2026.png` reproduces the computation for whatever site is configured (about 90 s). It prints angles and times only, never coordinates. The plot needs matplotlib, which is optional and is not in `requirements.txt`.
 
 ## Install
 
@@ -119,6 +140,8 @@ SolarTracker/
     test_site.py             Example site and local overrides
   packaging/
     run-solartracker-console.desktop.example
+  docs/sun_year_2026.png     2026 noon elevation and daylight azimuth chart
+  tools/annual_extremes.py   Recompute a year's extremes for the configured site
   requirements.txt
   LICENSE
   README.md
